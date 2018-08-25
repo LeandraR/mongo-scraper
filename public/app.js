@@ -1,9 +1,58 @@
 $.getJSON("/article", function (data) {
     console.log(data);
-    for (var i = 0; i < data.length; i++) {
-        $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].link + "</p>");
+    for (var i = 0; i < 10; i++) {
+        $("#articles").append(`<h3> <a href= "${data[i].link}" target="_blank"> ${data[i].headline}</a></h3> <button class="add-note" data-id=${data[i]._id}>Note</button> <div class="note-form">
+        </div>`)
+        //data-favorite = true for favorite button
     }
 });
+
+$(".faves").on("click", function(){
+    $.getJSON("/favourites", function (data) {
+        console.log(data);
+
+        //data-favorite = true for favorite button
+    })
+
+
+});
+
+
+
+$(document).on("click", "#scrape", function () {
+    window.location = "http://localhost:3000/scrape";
+});
+
+$(document).on("click", ".add-note", function () {
+    var id = $(this).data("id");
+    $(".note-form").html(`<input type="text" id="titleinput"><input type="text-area" id="bodyinput"><button class="add-note-input" data-id-note=${id}>Add Note</button>`)
+});
+
+$(document).on("click", ".add-note-input", function () {
+    var thisId = $(this).data("id-note");
+    var title = $("#titleinput").val();
+        // Value taken from note textarea
+    var bodyInput = $("#bodyinput").val();
+    alert(title+ bodyInput);
+    $.ajax({
+            method: "POST",
+            url: "/article/" + thisId,
+            data: {
+                // Value taken from title input
+                title: $("#titleinput").val(),
+                // Value taken from note textarea
+                note: $("#bodyinput").val()
+            }
+        })
+        // With that done
+        .then(function (data) {
+            // Log the response
+            console.log(data);
+        });
+
+});
+
+
 
 
 $(document).on("click", "p", function () {
@@ -47,7 +96,7 @@ $(document).on("click", "#savenote", function () {
     // Run a POST request to change the note, using what's entered in the inputs
     $.ajax({
             method: "POST",
-            url: "/articles/" + thisId,
+            url: "/article/" + thisId,
             data: {
                 // Value taken from title input
                 title: $("#titleinput").val(),
@@ -63,7 +112,6 @@ $(document).on("click", "#savenote", function () {
             $("#notes").empty();
         });
 
-    // Also, remove the values entered in the input and textarea for note entry
     $("#titleinput").val("");
     $("#bodyinput").val("");
 });

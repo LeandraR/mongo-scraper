@@ -7,7 +7,7 @@ var NoteSchema = new Schema({
     note: String
 });
 
-var Notes = mongoose.model("scraper", NoteSchema);
+var Note = mongoose.model("scraper", NoteSchema);
 
 
-module.exports = Notes;
+module.exports = Note;

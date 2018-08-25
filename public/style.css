@@ -309,3 +309,15 @@ header {
     text-align:center;
 }
 
+main,h3 {
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-content:center;
+    text-align:center;
+}
+
+h3 a {
+    max-width:80%;
+}
+
