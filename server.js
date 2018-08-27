@@ -42,7 +42,7 @@ app.get("/scrape", function (req, res) {
       }
       var $ = cheerio.load(html);
       $(".storylink").each(function(i, element) {
-        console.log("hello");
+        // console.log("hello");
         var result = {};
         result.headline = $(this).text();
         result.link = $(this).attr("href");
@@ -101,11 +101,34 @@ app.get("/favourites", function (req, res) {
 });
 
 //update favourite to true
-app.post("/favorites/:id", function (req, res) {
+app.post("/favourites/:id", function (req, res) {
+    console.log(req.params);
             // Use the article id to find and update its saved boolean
             Article.findOneAndUpdate({
                     "_id": req.params.id
                 }, {
+
+                    //TODO: how to change
+                    "favorite": true
+                })
+                // Execute the above query
+                .exec(function (err, doc) {
+                    // Log any errors
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        // Or send the document to the browser
+                        res.send(doc);
+                    }
+                });
+            });app.post("/favourites/:id", function (req, res) {
+    console.log(req.params);
+            // Use the article id to find and update its saved boolean
+            Article.findOneAndUpdate({
+                    "_id": req.params.id
+                }, {
+
+                    //TODO: how to change
                     "favorite": true
                 })
                 // Execute the above query
@@ -119,6 +142,26 @@ app.post("/favorites/:id", function (req, res) {
                     }
                 });
             });
+
+//TODO: cleaner way to do this rather than create a new route??
+
+app.post("/removefavourites/:id", function (req, res) {
+    Article.findOneAndUpdate({
+            "_id": req.params.id
+        }, {
+            "favorite": false
+        })
+        // Execute the above query
+        .exec(function (err, doc) {
+            // Log any errors
+            if (err) {
+                console.log(err);
+            } else {
+                // Or send the document to the browser
+                res.send(doc);
+            }
+        });
+});
 
 
 

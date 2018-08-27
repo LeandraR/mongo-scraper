@@ -258,10 +258,12 @@ template {
     overflow: hidden;
 }
 
-
-body {
+* {
     font-family: 'Sawarabi Gothic',
     sans-serif;
+}
+body {
+
     background:#E4C1F9;
     display:flex;
     flex-direction:column;
@@ -276,9 +278,10 @@ a {
     margin:5px;
 }
 
-a:hover {
+ul li a:hover, a:hover {
     background-color:#FCF6BD;
     transition:0.5s;
+    color:grey;
 }
 
 ul {
@@ -286,8 +289,26 @@ ul {
     display:flex;
     flex-direction:row;
     flex-wrap:wrap;
-    padding:15px;
     margin:0;
+}
+
+@media only screen and (min-width: 601px){
+    nav {
+        height:100%;
+    }
+}
+
+@media only screen and (max-width: 1153px) {
+    h2 {
+        font-size:1em;
+    }
+    h3 {
+        font-size:1em !important;
+    }
+    a {
+        font-size:0.8em;
+    }
+
 }
 
 nav {
@@ -304,8 +325,8 @@ header {
     justify-content:center;
     max-width:80%;
     align-self:center;
-    padding:5%;
-    margin-top:20px;
+    padding:3%;
+    margin:1% 0;
     text-align:center;
 }
 
@@ -317,7 +338,7 @@ main,h3 {
     text-align:center;
 }
 
-#articles, h3, button {
+#articles, section {
     display:flex;
     flex-direction:column;
     justify-content: center;
@@ -325,11 +346,51 @@ main,h3 {
     text-align:center;
     align-self:center;
 }
+h1 {
+    margin-top:1%;
+}
+
+h2 {
+    line-height:0;
+}
 
 h3 a {
     min-width:80%;
 }
+h3 {
+    font-size:1.5em;
+    margin:0;
+}
+h4 {
+    font-size:1em;
+}
 
-button {
+button, .btn {
     max-width:25%;
+    display:flex;
+    align-self:center;
+    background:#F19FC6;
+    padding:5px;
+    border-radius:5px;
+}
+
+.btn, .remove-fave {
+    height:100%;
+    background:#D7F3DF;
+    color:grey;
+}
+
+.btn:hover {
+    background:#F19FC6;
+
+}
+button i:hover {
+    transition:800ms;
+    transform:scale(1.3);
+
+}
+
+section {
+    border:1px solid grey;
+    margin:5px 0;
 }

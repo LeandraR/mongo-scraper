@@ -3,88 +3,43 @@ $(document).ready(function () {
     $('.modal').modal();
 });
 
-
 //get request for articles, appending first 10 to page with fave button, note button
 $.getJSON("/article", function (data) {
     console.log(data.reverse());
     for (var i = 0; i < 10; i++) {
-        $("#articles").append(`<h3> <a href= "${data[i].link}" target="_blank"> ${data[i].headline}</a></h3>
-        <h4><a href= "${data[i].link}" target="_blank">${data[i].link}</a></h4>
+        $("#articles").append(`
+        <section>
+            <h3>${data[i].headline}</h3>
+            <h4>
+                <a href= "${data[i].link}" target="_blank">${data[i].link}</a></h4>
 
-        <button class="add-fave-button" data-fave-id=${data[i]._id}><i class="fas fa-heart">Add Favourite</i></button>
+            <button class="add-fave-button" data-fave-id=${data[i]._id}><i class="fas fa-heart"></i></button>
 
-        <a class="waves-effect waves-light btn modal-trigger" href="#modal1" data-id=${data[i]._id}>Add a Note</a>
+            <a class="waves-effect waves-light btn modal-trigger" href="#modal1" data-target="modal1">Add a Note</a>
 
-        <div id="modal1" class="modal">
-            <div class="modal-content">
-                <h5>Add a Note to this Article:</h5>
-                <input type="text" id="titleinput" placeholder="Note title">
-                <input type="text-area" id="bodyinput" placeholder="Note text">
-                <button class="add-note-input" data-id-note="id">Add
-                    Note</button>
+            <div id="modal1" class="modal">
+                <div class="modal-content">
+                    <h5>Add a Note to this Article:</h5>
+                    <input type="text" id="titleinput" placeholder="Note title">
+                    <input type="text-area" id="bodyinput" placeholder="Note text">
+
+                    <button class="add-note-input" data-id-note=${data[i]._id}>Add Note</button>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+                </div>
             </div>
-            <div class="modal-footer">
-                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-            </div>
-        </div>
+        </section>
         `);
     };
 });
-
-//change favorite value to true if 'favorite' button clicked
-$(document).on("click", ".add-fave-button", function(){
-    var thisId = $(this).data("fave-id");
-    console.log(thisId);
-    $.ajax({
-        method: "POST",
-        url: "/favorites/" + thisId,
-        data: {
-            favorite: true
-        }
-    })
-        .then(function (data) {
-            console.log(data);
-        });
-
-});
-
-
-
-//on click of favourites button, display favourite = true
-$(".faves").on("click", function(){
-    $.getJSON("/favourites", function (data) {
-        $("#articles").empty();
-        $("#articles").append(`<h2>Favourite Articles</h2>`);
-        for (var i = 0; i < data.length; i++) {
-            $("#articles").append(`
-                    <h3> <a href= "${data[i].link}" target="_blank"> ${data[i].headline}</a></h3>
-
-                    <button class="add-note" data-id=${data[i]._id}>Note</button>
-
-
-                    `);
-        }
-    })
-});
-
-
-//when scrape button clicked, scrape new articles
-$(document).on("click", "#scrape", function () {
-    window.location = "http://localhost:3000/scrape";
-});
-
-//when add note button clicked, show note input
-// $(document).on("click", ".add-note", function () {
-//     var id = $(this).data("id");
-//     $(".note-form").html(`
-//     <input type="text" id="titleinput"><input type="text-area" id="bodyinput"><button class="add-note-input" data-id-note=${id}>Add Note</button>`)
-// });
 
 //when add note submit is clicked, take text input & post to mongo
 $(document).on("click", ".add-note-input", function () {
     var thisId = $(this).data("id-note");
     var title = $("#titleinput").val();
-        // Value taken from note textarea
+    // Value taken from note textarea
     var bodyInput = $("#bodyinput").val();
     console.log(title, bodyInput)
     $.ajax({
@@ -102,6 +57,100 @@ $(document).on("click", ".add-note-input", function () {
         });
 
 });
+
+
+// $(document).on("click", ".modal-trigger", function(){
+//     console.log("modal click");
+// })
+
+//TODO: display all notes on article
+
+// $(".add-note-input").on("click", function () {
+//     console.log("working notes")
+//     $("#titleinput, #bodyinput").empty();
+//     // Save the id from the p tag
+//     var id = $(this).attr("data-id");
+//     $.ajax({
+//             method: "GET",
+//             url: "/articles/" + id
+//         })
+//         .then(function (data) {
+//             console.log(data);
+//             $(".your-notes").append(data.note.body)
+//         });
+// });
+
+//change favorite value to true if 'favorite' button clicked
+$(document).on("click", ".add-fave-button", function(){
+    var thisId = $(this).data("fave-id");
+    console.log(thisId);
+    $.ajax({
+        method: "POST",
+        url: "/favourites/" + thisId,
+        data: {
+            favorite: true
+        }
+    })
+        .then(function (data) {
+            console.log(data);
+        });
+
+});
+
+
+
+//on click of favourite in nav, display favourite = true
+$(".faves").on("click", function(){
+    $.getJSON("/favourites", function (data) {
+        $("#articles").empty();
+        $("#articles").append(`<h2>Favourite Articles</h2>`);
+        for (var i = 0; i < data.length; i++) {
+            $("#articles").append(`
+            <section>
+                    <h3> <a href= "${data[i].link}" target="_blank"> ${data[i].headline}</a></h3>
+
+                    <button class="remove-fave" data-id=${data[i]._id}><i class="fas fa-trash-alt"></i></button>
+
+                    <button class="view-notes" data-id=${data[i]._id}>View Notes</button>
+
+                    </section>
+                    `);
+        };
+
+        //TODO: cleaner way to do this rather than create a new route??
+        $(".remove-fave").on("click", function () {
+            console.log('removing');
+            var thisRemove = $(this).data("id");
+            $.ajax({
+                    method: "POST",
+                    url: "/removefavourites/" + thisRemove,
+                    data: {
+                        favorite: false
+                    }
+                })
+                .then(function (data) {
+                    console.log(data);
+                });
+        })
+    })
+});
+
+
+
+//when add note button clicked, show note input
+// $(document).on("click", ".add-note", function () {
+//     var id = $(this).data("id");
+//     $(".note-form").html(`
+//     <input type="text" id="titleinput"><input type="text-area" id="bodyinput"><button class="add-note-input" data-id-note=${id}>Add Note</button>`)
+// });
+
+
+
+//when scrape button clicked, scrape new articles
+$(document).on("click", "#scrape", function () {
+    window.location = "http://localhost:3000/scrape";
+});
+
 
 
 
