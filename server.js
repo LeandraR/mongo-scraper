@@ -11,6 +11,7 @@ mongoose.Promise = Promise;
 
 var app = express();
 
+
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -28,43 +29,43 @@ db.once("open", function () {
     console.log("Mongoose connection successful.");
 });
 
-// mongoose routes
 
+//scraping route
 app.get("/scrape", function (req, res) {
-    request("https://news.ycombinator.com/", function (error, response, html) {
+    request("https://news.ycombinator.com/news", function(
+      error,
+      response,
+      html
+    ) {
+      if (error) {
+        console.log(error);
+      }
+      var $ = cheerio.load(html);
+      $(".storylink").each(function(i, element) {
+        console.log("hello");
+        var result = {};
+        result.headline = $(this).text();
+        result.link = $(this).attr("href");
+        // $('p.summary').each(function (i, element) {
+        //     var result = {};
+        //     result.summary = $(this).children("a").text();
+        // })
+        console.log("result");
+        var entry = new Article(result);
 
-        if (error){
-            console.log(error)
-        }
-        var $ = cheerio.load(html);
-        $('.storylink').each(function (i, element) {
-            console.log("hello");
-            var result = {};
-            result.headline = $(this).text();
-            result.link = $(this).attr("href");
-            // $('p.summary').each(function (i, element) {
-            //     var result = {};
-            //     result.summary = $(this).children("a").text();
-            // })
-            console.log("result");
-            var entry = new Article(result);
-
-
-            entry.save(function (err, doc) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(doc);
-                }
-            });
+        entry.save(function(err, doc) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(doc);
+          }
         });
-
-
+      });
     });
     res.redirect("index.html");
 });
 
-//{favorite = true}b
+//get articles
 app.get("/article", function (req, res) {
     Article.find({}, function (error, doc) {
         if (error) {
@@ -75,6 +76,20 @@ app.get("/article", function (req, res) {
     });
 });
 
+//post new note
+app.post("/article/:id", function (req, res) {
+    console.log(req.body);
+    var newNote = new Note(req.body);
+    newNote.save(function (err, doc) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(doc);
+        }
+    });
+});
+
+//find favourites = true
 app.get("/favourites", function (req, res) {
     Article.find({favorite : true}, function (error, doc) {
         if (error) {
@@ -85,20 +100,28 @@ app.get("/favourites", function (req, res) {
     });
 });
 
-//looks for note field in article collection, passes id value
-app.get("/article/:id", function (req, res) {
-    Article.findOne({
-            "_id": req.params.id
-        })
-        .populate("note")
-        .exec(function (error, doc) {
-            if (error) {
-                console.log(error);
-            } else {
-                res.json(doc);
-            }
-        });
-});
+//update favourite to true
+app.post("/favorites/:id", function (req, res) {
+            // Use the article id to find and update its saved boolean
+            Article.findOneAndUpdate({
+                    "_id": req.params.id
+                }, {
+                    "favorite": true
+                })
+                // Execute the above query
+                .exec(function (err, doc) {
+                    // Log any errors
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        // Or send the document to the browser
+                        res.send(doc);
+                    }
+                });
+            });
+
+
+
 
 app.post("/article/:id", function (req, res) {
     console.log(req.body);

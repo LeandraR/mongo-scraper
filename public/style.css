@@ -317,7 +317,19 @@ main,h3 {
     text-align:center;
 }
 
-h3 a {
-    max-width:80%;
+#articles, h3, button {
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-content:center;
+    text-align:center;
+    align-self:center;
 }
 
+h3 a {
+    min-width:80%;
+}
+
+button {
+    max-width:25%;
+}
