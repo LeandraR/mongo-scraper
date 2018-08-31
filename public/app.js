@@ -102,7 +102,7 @@ $(document).on("click", ".add-fave-button", function(){
 });
 
 //on click of favourite in nav, display favourite = true
-$(".faves").on("click", function(){
+$(document).on("click", ".faves",function () {
     $.getJSON("/favourites", function (data) {
         $("#articles").empty();
         $("#articles").append(`<h2>Favourite Articles</h2>`);
