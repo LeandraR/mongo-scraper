@@ -111,7 +111,7 @@ app.get("/notes-articles/:id", function (req, res) {
         }
     });
 });
-//app.delete route to remove notes
+
 
 app.delete("/notes-article/:id", function (req, res) {
     console.log(req.params.id);
@@ -140,7 +140,7 @@ app.get("/article/:id", function (req, res) {
     });
 });
 
-//find favourites = true
+
 app.get("/favourites", function (req, res) {
     Article.find({favorite : true}, function (error, doc) {
         if (error) {
