@@ -1,7 +1,6 @@
 //initialize modal
 $(document).ready(function () {
     $('.modal').modal();
-});
 
 //get request for articles, appending first 10 to page with fave button, note button
 $.getJSON("/article", function (data) {
@@ -15,70 +14,75 @@ $.getJSON("/article", function (data) {
 
             <button class="add-fave-button" data-fave-id=${data[i]._id}><i class="fas fa-heart"></i></button>
 
-            <a class="waves-effect waves-light btn modal-trigger" href="#modal1" data-target="modal1">Add a Note</a>
+            <a class = "waves-effect waves-light btn modal-trigger add-note" data-target = "modal1" href = "#modal1" data-article-id=${data[i]._id}> Add a Note </a>
 
-            <div id="modal1" class="modal">
-                <div class="modal-content">
-                    <h5>Add a Note to this Article:</h5>
-                    <input type="text" id="titleinput" placeholder="Note title">
-                    <input type="text-area" id="bodyinput" placeholder="Note text">
-
-                    <button class="add-note-input" data-id-note=${data[i]._id}>Add Note</button>
-                </div>
-
-                <div class="modal-footer">
-                    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-                </div>
-            </div>
         </section>
         `);
     };
 });
 
-//when add note submit is clicked, take text input & post to mongo
-$(document).on("click", ".add-note-input", function () {
-    var thisId = $(this).data("id-note");
-    var title = $("#titleinput").val();
-    // Value taken from note textarea
-    var bodyInput = $("#bodyinput").val();
-    console.log(title, bodyInput)
+//when 'add note' is clicked, display all other notes on this article
+$(document).on("click", ".add-note", function () {
+    $(".your-notes").empty();
+    var thisId = $(this).data("article-id");
+    console.log(thisId);
     $.ajax({
-            method: "POST",
-            url: "/article/" + thisId,
-            data: {
-                // Value taken from title input
-                title: $("#titleinput").val(),
-                // Value taken from note textarea
-                note: $("#bodyinput").val()
-            }
+            method: "GET",
+            url: "/notes-articles/" + thisId
         })
         .then(function (data) {
-            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                $(".your-notes").append(`
+                <section class="note-body-parent">
+                        <p>${data[i].title}</p>
+                        <p>${data[i].note}</p>
+
+                        <button id="delete" data-note-del=${data[i]._id}><i class="fas fa-trash-alt"></i></button>
+                </section>
+                        `)
+            };
         });
 
+//when note submit is clicked, add to mongo
+    $(document).on("click", ".add-note-input", function () {
+        var thisId = $(".add-note").data("article-id");
+        var title = $("#titleinput").val();
+        var bodyInput = $("#bodyinput").val();
+        console.log(title, bodyInput);
+        $.ajax({
+            method: "POST",
+                url: "/article/" + thisId,
+                data: {
+                    // Value taken from title input
+                    title: $("#titleinput").val(),
+                    // Value taken from note textarea
+                    note: $("#bodyinput").val(),
+                    articleId: thisId
+                }
+            }).then (
+                $("#titleinput").val(""),
+                $("#bodyinput").val(""),
+                console.log("note added to database")
+            )
+        });
 });
 
-
-// $(document).on("click", ".modal-trigger", function(){
-//     console.log("modal click");
-// })
-
-//TODO: display all notes on article
-
-// $(".add-note-input").on("click", function () {
-//     console.log("working notes")
-//     $("#titleinput, #bodyinput").empty();
-//     // Save the id from the p tag
-//     var id = $(this).attr("data-id");
-//     $.ajax({
-//             method: "GET",
-//             url: "/articles/" + id
-//         })
-//         .then(function (data) {
-//             console.log(data);
-//             $(".your-notes").append(data.note.body)
-//         });
-// });
+//delete note function on button click
+$(document).on("click","#delete", function(){
+    var thisId = $(this).data("note-del");
+    var selected = $(this).parent();
+    console.log(thisId);
+    $.ajax({
+        method:"DELETE",
+        url: "/notes-article/" + thisId,
+        success: function(response){
+            selected.remove();
+            $("#titleinput").val("");
+            $("#bodyinput").val("");
+            selected.val("");
+        }
+    })
+});
 
 //change favorite value to true if 'favorite' button clicked
 $(document).on("click", ".add-fave-button", function(){
@@ -97,8 +101,6 @@ $(document).on("click", ".add-fave-button", function(){
 
 });
 
-
-
 //on click of favourite in nav, display favourite = true
 $(".faves").on("click", function(){
     $.getJSON("/favourites", function (data) {
@@ -111,7 +113,6 @@ $(".faves").on("click", function(){
 
                     <button class="remove-fave" data-id=${data[i]._id}><i class="fas fa-trash-alt"></i></button>
 
-                    <button class="view-notes" data-id=${data[i]._id}>View Notes</button>
 
                     </section>
                     `);
@@ -135,88 +136,9 @@ $(".faves").on("click", function(){
     })
 });
 
-
-
-//when add note button clicked, show note input
-// $(document).on("click", ".add-note", function () {
-//     var id = $(this).data("id");
-//     $(".note-form").html(`
-//     <input type="text" id="titleinput"><input type="text-area" id="bodyinput"><button class="add-note-input" data-id-note=${id}>Add Note</button>`)
-// });
-
-
-
 //when scrape button clicked, scrape new articles
 $(document).on("click", "#scrape", function () {
     window.location = "http://localhost:3000/scrape";
 });
 
-
-
-
-
-
-
-
-
-
-// $(document).on("click", "p", function () {
-//     // Empty the notes from the note section
-//     $("#notes").empty();
-//     // Save the id from the p tag
-//     var thisId = $(this).attr("data-id");
-
-//     // Now make an ajax call for the Article
-//     $.ajax({
-//             method: "GET",
-//             url: "/article/" + thisId
-//         })
-//         // With that done, add the note information to the page
-//         .then(function (data) {
-//             console.log(data);
-//             // The title of the article
-//             $("#notes").append("<h2>" + data.title + "</h2>");
-//             // An input to enter a new title
-//             $("#notes").append("<input id='titleinput' name='title' >");
-//             // A textarea to add a new note body
-//             $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
-//             // A button to submit a new note, with the id of the article saved to it
-//             $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-
-//             // If there's a note in the article
-//             if (data.note) {
-//                 // Place the title of the note in the title input
-//                 $("#titleinput").val(data.note.title);
-//                 // Place the body of the note in the body textarea
-//                 $("#bodyinput").val(data.note.body);
-//             }
-//         });
-// });
-
-// // When you click the savenote button
-// $(document).on("click", "#savenote", function () {
-//     // Grab the id associated with the article from the submit button
-//     var thisId = $(this).attr("data-id");
-
-//     // Run a POST request to change the note, using what's entered in the inputs
-//     $.ajax({
-//             method: "POST",
-//             url: "/article/" + thisId,
-//             data: {
-//                 // Value taken from title input
-//                 title: $("#titleinput").val(),
-//                 // Value taken from note textarea
-//                 body: $("#bodyinput").val()
-//             }
-//         })
-//         // With that done
-//         .then(function (data) {
-//             // Log the response
-//             console.log(data);
-//             // Empty the notes section
-//             $("#notes").empty();
-//         });
-
-//     $("#titleinput").val("");
-//     $("#bodyinput").val("");
-// });
+});

@@ -356,10 +356,13 @@ h2 {
 
 h3 a {
     min-width:80%;
+
 }
 h3 {
     font-size:1.5em;
     margin:0;
+    background:#B3DDF6;
+    padding:1%;
 }
 h4 {
     font-size:1em;
@@ -393,4 +396,18 @@ button i:hover {
 section {
     border:1px solid grey;
     margin:5px 0;
+}
+
+.note-body-parent {
+    display:flex;
+    flex-direction:column;
+}
+
+#titleinput {
+    background-color:white;
+}
+
+#bodyinput {
+    width:100%;
+    line-height:2;
 }

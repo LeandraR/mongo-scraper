@@ -29,10 +29,28 @@
     </nav>
     <header>
         <h1>Mongo Scraper</h1>
-        <h2>Your source for Hacker Noon News!</h2>
+        <h2>Your source for Hacker News!</h2>
 
     </header>
     <main id="articles">
+
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <h5>Add a Note to this Article:</h5>
+                <input type="text" id="titleinput" placeholder="Note title">
+                <input type="text-area" id="bodyinput" placeholder="Note text">
+
+                <button class="add-note-input" data-id-=${data[i]._id}>Add Note</button>
+                <section>
+                    <h5>Other Notes:</h5>
+                    <div class="your-notes"></div>
+                </section>
+            </div>
+
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+            </div>
+        </div>
 
 
     </main>

@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 
 var NoteSchema = new Schema({
     title: String,
-    note: String
+    note: String,
+    articleId: String
 });
 
 var Note = mongoose.model("scraper", NoteSchema);

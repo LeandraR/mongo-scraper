@@ -7,7 +7,15 @@ var request = require('request');
 var Note = require('./models/notes.js');
 var Article = require('./models/articles.js');
 
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/scrapedArticles";
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
 mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
+
 
 var app = express();
 
@@ -18,7 +26,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/scrapedArticles");
+// mongoose.connect("mongodb://localhost/scrapedArticles");
 var db = mongoose.connection;
 
 db.on("error", function (error) {
@@ -84,6 +92,49 @@ app.post("/article/:id", function (req, res) {
         if (err) {
             console.log(err);
         } else {
+            res.send(doc);
+        }
+    });
+});
+
+app.get("/notes-articles/:id", function (req, res) {
+    console.log(req.body);
+    Note.find({
+        "articleId": req.params.id
+    },
+        function (err, doc) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(doc);
+            res.send(doc);
+        }
+    });
+});
+//app.delete route to remove notes
+
+app.delete("/notes-article/:id", function (req, res) {
+    console.log(req.params.id);
+    Note.remove({
+        "_id": req.params.id
+    },
+    function(err, doc){
+        if (err){
+            console.log(err);
+        } else {
+            console.log(doc);
+            res.send(doc);
+        }
+    });
+});
+
+app.get("/article/:id", function (req, res) {
+    console.log(req.body);
+    Article.find(function (err, doc) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(doc);
             res.send(doc);
         }
     });
@@ -166,17 +217,7 @@ app.post("/removefavourites/:id", function (req, res) {
 
 
 
-app.post("/article/:id", function (req, res) {
-    console.log(req.body);
-    var newNote = new Note(req.body);
-    newNote.save(function (err, doc) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.send(doc);
-        }
-    });
-});
+
 
 app.listen(3000, function () {
     console.log("Running on port 3000");
