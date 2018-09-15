@@ -6,7 +6,7 @@ var cheerio = require('cheerio');
 var request = require('request');
 var Note = require('./models/notes.js');
 var Article = require('./models/articles.js');
-require('dotenv').config();
+// require('dotenv').config();
 
 
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
